@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,9 +31,10 @@ namespace PlanPresentation
 
         public void DrawPlan()
         {
-            for (var x = 0; x < _currentPlan.Width; x++)
+            _viewWindow.Children.Clear();
+            for (var x = 0; x < (_currentPlan?.Width ?? 0); x++)
             {
-                for (var y = 0; y < _currentPlan.Height; y++)
+                for (var y = 0; y < (_currentPlan?.Height ?? 0); y++)
                 {
                     var centerPoint = new Point(x * CellSize.Width + CellSize.Width / 2.0,
                         y * CellSize.Height + CellSize.Height / 2.0);
@@ -44,12 +46,11 @@ namespace PlanPresentation
         public void RegeneratePlan(int width, int heigth)
         {
             _currentPlan = _planGenerator.CreateRandomPlan(width, heigth);
-            _viewWindow.Children.Clear();
         }
 
-        public void DrawCell(Cell cell, Point centerPoint)
+        private void DrawCell(Cell cell, Point centerPoint)
         {
-            var myRect = new Border
+            var cellToDraw = new Border
             {
                 Height = CellSize.Height,
                 Width = CellSize.Width,
@@ -60,11 +61,11 @@ namespace PlanPresentation
                 BorderBrush = new SolidColorBrush(Color.FromRgb(0, 0, 0))
             };
 
-            Canvas.SetLeft(myRect, centerPoint.X - myRect.Width / 2);
-            Canvas.SetTop(myRect, centerPoint.Y - myRect.Height / 2);
+            Canvas.SetLeft(cellToDraw, centerPoint.X - cellToDraw.Width / 2);
+            Canvas.SetTop(cellToDraw, centerPoint.Y - cellToDraw.Height / 2);
 
 
-            _viewWindow.Children.Add(myRect);
+            _viewWindow.Children.Add(cellToDraw);
         }
     }
 }

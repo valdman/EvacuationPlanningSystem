@@ -1,7 +1,7 @@
-﻿<Application x:Class="TaskMaze.App"
+﻿<Application x:Class="EvacuationPlanningSystem.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:TaskMaze"
+             xmlns:local="clr-namespace:EvacuationPlanningSystem"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
