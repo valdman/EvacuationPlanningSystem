@@ -1,0 +1,16 @@
+﻿<Window x:Class="TaskMaze.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TaskMaze"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Button Name="RegenertePlanButton" Content="Regenerate plan" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="60, 10" Width="110" Height="20"/>
+        <TextBox Name="PeopleInput" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10" TextWrapping="Wrap" Text="1" Width="30" Height="20"/>
+        <Button Name="StartButton" Content="Start simulation" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" Height="20" Width="90"/>
+        <Canvas Name="Canvas" Margin="0,0,0,50"/>
+
+    </Grid>
+</Window>
