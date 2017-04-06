@@ -7,17 +7,21 @@ using PlanPresentation;
 namespace EvacuationPlanningSystem
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    ///     Логика взаимодействия для MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const double ScaleRate = 1.1;
+        private readonly PlanPresentor _planPresentor;
+        private DateTimeOffset _timeOffsetDueLastReload;
+
         public MainWindow()
         {
             InitializeComponent();
             _planPresentor = new PlanPresentor(ref Canvas);
             _timeOffsetDueLastReload = DateTimeOffset.Now;
 
-            RegenertePlanButton.Click += (sender, args) => 
+            RegenertePlanButton.Click += (sender, args) =>
             {
                 if (!int.TryParse(WidthInput.Text, out int width) || !int.TryParse(HeightInput.Text, out int height))
                 {
@@ -34,9 +38,9 @@ namespace EvacuationPlanningSystem
             {
                 var heigthDifference = Math.Abs(args.NewSize.Height - args.PreviousSize.Height);
                 var weightDifference = Math.Abs(args.NewSize.Width - args.PreviousSize.Width);
-                if ((DateTimeOffset.Now - _timeOffsetDueLastReload).Milliseconds > 100 || 
-                                                                 heigthDifference > 10 ||
-                                                                 weightDifference > 10)
+                if ((DateTimeOffset.Now - _timeOffsetDueLastReload).Milliseconds > 100 ||
+                    heigthDifference > 10 ||
+                    weightDifference > 10)
                 {
                     _planPresentor.DrawPlan();
                     _planPresentor.DrawGatesAndPeople();
@@ -54,10 +58,11 @@ namespace EvacuationPlanningSystem
                     _planPresentor.RunRandomSimulation(gatesCapasities, manCount);
                     //_planPresentor.DrawSolution();
                 }
-                catch (FormatException e)
+                catch (FormatException)
                 {
-                    MessageBox.Show("Ivalid gates capasities or man count. It must be list of integer (for example \"1,2,4,4\")\n" +
-                                    "Man count must be integer");
+                    MessageBox.Show(
+                        "Ivalid gates capasities or man count. It must be list of integer (for example \"1,2,4,4\")\n" +
+                        "Man count must be integer");
                 }
             };
 
@@ -76,9 +81,5 @@ namespace EvacuationPlanningSystem
                 }
             };
         }
-
-        private const double ScaleRate = 1.1;
-        private readonly PlanPresentor _planPresentor;
-        private DateTimeOffset _timeOffsetDueLastReload;
     }
 }

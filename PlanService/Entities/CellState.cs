@@ -10,6 +10,6 @@ namespace PlanService.Entities
         Bottom = 4,
         Left = 8,
         Visited = 128,
-        Initial = Top | Right | Bottom | Left,
+        Initial = Top | Right | Bottom | Left
     }
 }

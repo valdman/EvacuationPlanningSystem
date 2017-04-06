@@ -11,7 +11,7 @@ namespace PlanService.Entities
             PeopleOnWay = 0;
         }
 
-        public List<Point> WayOut { get; private set; }
+        public List<Point> WayOut { get; }
         public int PeopleOnWay { get; set; }
     }
 }

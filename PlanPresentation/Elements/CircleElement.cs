@@ -10,14 +10,13 @@ namespace PlanPresentation.Elements
     {
         protected CircleElement(string content, Rect cellSize, Brush colorBrush)
         {
-            var ellipseSize = new[] { cellSize.Height / 2.0, cellSize.Width / 2.0 }.Min();
+            var ellipseSize = new[] {cellSize.Height / 2.0, cellSize.Width / 2.0}.Min();
 
             var grid = new Grid();
             grid.Children.Add(new Border
             {
                 BorderThickness = new Thickness(0.5),
                 BorderBrush = new SolidColorBrush(Colors.LightSeaGreen)
-
             });
             grid.Children.Add(new Ellipse
             {

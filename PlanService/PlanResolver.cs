@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using PlanService.Entities;
-using Point = System.Drawing.Point;
 
 namespace PlanService
 {
     public class PlanResolver
     {
+        private readonly Plan _plan;
+
         public PlanResolver(Plan plan)
         {
             _plan = plan;
@@ -16,9 +16,7 @@ namespace PlanService
         public IEnumerable<Way> FindGateway(Point beginPoint)
         {
             foreach (var cell in _plan)
-            {
                 cell.CellState &= ~CellState.Visited;
-            }
 
             var ways = new List<Way>();
             var backtrack = new Dictionary<Point, Point>();
@@ -84,7 +82,7 @@ namespace PlanService
             if (!cellState.HasFlag(CellState.Left))
             {
                 var leftCell = new Point(cellToGetNeighbours.X - 1, cellToGetNeighbours.Y);
-                if(!_plan[leftCell].CellState.HasFlag(CellState.Visited))
+                if (!_plan[leftCell].CellState.HasFlag(CellState.Visited))
                     yield return leftCell;
             }
 
@@ -102,12 +100,10 @@ namespace PlanService
             }
             if (!cellState.HasFlag(CellState.Bottom))
             {
-                var bottomCell = new Point(cellToGetNeighbours.X , cellToGetNeighbours.Y + 1);
+                var bottomCell = new Point(cellToGetNeighbours.X, cellToGetNeighbours.Y + 1);
                 if (!_plan[bottomCell].CellState.HasFlag(CellState.Visited))
                     yield return bottomCell;
             }
         }
-
-        private Plan _plan;
     }
 }

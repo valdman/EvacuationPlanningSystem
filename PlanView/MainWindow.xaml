@@ -7,31 +7,40 @@
         mc:Ignorable="d"
         Title="EvacuationPlanning" Height="600" Width="600" MinWidth="600">
     <Grid>
-        <Canvas Name="Canvas" Margin="0,0,0,80"/>
-        <Canvas/>
-            <Grid VerticalAlignment="Bottom" Height="80">
+        <Canvas Name="Canvas" Margin="0,0,0,80" />
+        <Canvas />
+        <Grid VerticalAlignment="Bottom" Height="80">
 
-            <Grid Name="PlanBlock" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="130" Height="74" Margin="2" >
-                <Border BorderThickness="1" BorderBrush="Black"></Border>
+            <Grid Name="PlanBlock" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="130" Height="74"
+                  Margin="2">
+                <Border BorderThickness="1" BorderBrush="Black" />
                 <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0">Input maze size</Label>
                 <Grid HorizontalAlignment="Center" Width="80" Height="20">
-                    <TextBox Name="WidthInput" HorizontalAlignment="Left" VerticalAlignment="Bottom" TextWrapping="Wrap" Width="30" Height="20"/>
-                    <TextBox Name="HeightInput" HorizontalAlignment="Right" VerticalAlignment="Bottom" TextWrapping="Wrap" Width="30" Height="20"/>
+                    <TextBox Name="WidthInput" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                             TextWrapping="Wrap" Width="30" Height="20" />
+                    <TextBox Name="HeightInput" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                             TextWrapping="Wrap" Width="30" Height="20" />
                 </Grid>
-                <Button Name="RegenertePlanButton" Content="Regenerate plan" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Width="110" Height="20"/>
+                <Button Name="RegenertePlanButton" Content="Regenerate plan" HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom" Margin="5" Width="110" Height="20" />
             </Grid>
-            <Grid Name="GatesCountBlock" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="80" Height="50" Margin="150, 10">
-                <Border BorderThickness="1" BorderBrush="Black"></Border>
+            <Grid Name="GatesCountBlock" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="80" Height="50"
+                  Margin="150, 10">
+                <Border BorderThickness="1" BorderBrush="Black" />
                 <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="2">Gate's sizes</Label>
-                <TextBox Name="GateCapasities" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10, 5" TextWrapping="Wrap" Width="60" Height="20" Text="5,5,5"/>
+                <TextBox Name="GateCapasities" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10, 5"
+                         TextWrapping="Wrap" Width="60" Height="20" Text="5,5,5" />
             </Grid>
-            <Grid Name="ManCountBlock" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="80" Height="50" Margin="250, 10">
-                <Border BorderThickness="1" BorderBrush="Black"></Border>
+            <Grid Name="ManCountBlock" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="80" Height="50"
+                  Margin="250, 10">
+                <Border BorderThickness="1" BorderBrush="Black" />
                 <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="2">Man Count</Label>
-                <TextBox Name="ManCount" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10, 5" TextWrapping="Wrap" Width="30" Height="20" Text="13"/>
+                <TextBox Name="ManCount" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10, 5"
+                         TextWrapping="Wrap" Width="30" Height="20" Text="13" />
             </Grid>
 
-            <Button Name="StartButton" Content="Start simulation" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20" Height="20" Width="90"/>
+            <Button Name="StartButton" Content="Start simulation" HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" Margin="20" Height="20" Width="90" />
         </Grid>
     </Grid>
 </Window>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace PlanPresentation
@@ -11,12 +10,10 @@ namespace PlanPresentation
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values[0] == DependencyProperty.UnsetValue || values[1] == DependencyProperty.UnsetValue)
-            {
                 return DependencyProperty.UnsetValue;
-            }
 
-            double width = (double)values[0];
-            double height = (double)values[1];
+            var width = (double) values[0];
+            var height = (double) values[1];
 
             return new Thickness(-width / 2, -height / 2, 0, 0);
         }

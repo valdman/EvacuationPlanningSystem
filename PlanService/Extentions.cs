@@ -20,12 +20,12 @@ namespace PlanService
 
         public static CellState OppositeWall(this CellState cellState)
         {
-            return (CellState)(((int)cellState >> 2) | ((int)cellState << 2)) & CellState.Initial;
+            return (CellState) (((int) cellState >> 2) | ((int) cellState << 2)) & CellState.Initial;
         }
 
         public static bool HasFlag(this CellState cellState, CellState flag)
         {
-            return ((int)cellState & (int)flag) != 0;
+            return ((int) cellState & (int) flag) != 0;
         }
     }
 }
