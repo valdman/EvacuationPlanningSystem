@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using PlanService.Entities;
+using Point = System.Drawing.Point;
 
 namespace PlanService
 {
@@ -13,10 +14,34 @@ namespace PlanService
             var plan = new Plan(width, height);
             
             VisitCell(plan, _randomGenerator.Next(width), _randomGenerator.Next(height));
-            plan.Display();
             return plan;
         }
 
+        public Plan LocateGatesAndPeopleRandom(Plan plan, IEnumerable<int> gatesCapasities, int peopleNumber)
+        {
+            foreach (var cell in plan)
+            {
+                cell.GateCapasity = 0;
+                cell.NumberOfManHere = 0;
+            }
+
+            var randomIndexGenerator = new Random();
+            for (var i = 0; i < peopleNumber; i++)
+            {
+                var x = randomIndexGenerator.Next(plan.Width);
+                var y = randomIndexGenerator.Next(plan.Height);
+                plan[x, y].NumberOfManHere++;
+            }
+
+            foreach (var gatesCapasity in gatesCapasities)
+            {
+                var x = randomIndexGenerator.Next(plan.Width);
+                var y = randomIndexGenerator.Next(plan.Height);
+                plan[x, y].GateCapasity += gatesCapasity;
+            }
+
+            return plan;
+        }
 
         private IEnumerable<RemoveWallAction> GetNeighboursOfCell(Plan plan, Point cellCoords)
         {

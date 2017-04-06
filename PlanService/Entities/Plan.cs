@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace PlanService.Entities
 {
-    public class Plan
+    public class Plan : IEnumerable<Cell>
     {
         public Plan(int width, int height)
         {
@@ -15,7 +16,7 @@ namespace PlanService.Entities
             { 
                 for (var y = 0; y < height; y++)
                 {
-                    Cells[x, y] = new Cell(CellState.Initial, 0);
+                    Cells[x, y] = new Cell(CellState.Initial);
                 }
             }
 
@@ -24,37 +25,36 @@ namespace PlanService.Entities
 
         public Cell this[int x, int y]
         {
-            get { return Cells[x, y]; }
-            set { Cells[x, y] = value; }
+            get => Cells[x, y];
+            set => Cells[x, y] = value;
         }
 
-        public string Display()
+        public Cell this[Point point]
         {
-            var result = new StringBuilder(string.Empty);
-            var firstLine = string.Empty;
-            for (var y = 0; y < Height; y++)
+            get => Cells[point.X, point.Y];
+            set => Cells[point.X, point.Y] = value;
+        }
+
+        public IEnumerator<Cell> GetEnumerator()
+        {
+            for (var x = 0; x < Width; x++)
             {
-                var sbTop = new StringBuilder();
-                var sbMid = new StringBuilder();
-                for (var x = 0; x < Width; x++)
+                for (var y = 0; y < Height; y++)
                 {
-                    sbTop.Append(this[x, y].CellState.HasFlag(CellState.Top) ? "+--" : "+  ");
-                    sbMid.Append(this[x, y].CellState.HasFlag(CellState.Left) ? "|  " : "   ");
+                    yield return this[x, y];
                 }
-                if (firstLine == string.Empty)
-                    firstLine = sbTop.ToString();
-                result.AppendLine(sbTop + "+");
-                result.AppendLine(sbMid + "|");
-                result.AppendLine(sbMid + "|");
             }
-            result.AppendLine(firstLine);
-            Debug.WriteLine(result.ToString());
-            return result.ToString();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public Cell[,] Cells { get; }
         public int Width { get; private set; }
         public int Height { get; private set; }
         public Random RandomGenerator { get; private set; }
+
     }
 }

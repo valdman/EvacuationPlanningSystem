@@ -44,6 +44,7 @@
     <Compile Include="Entities\Cell.cs" />
     <Compile Include="Entities\CellState.cs" />
     <Compile Include="Entities\Plan.cs" />
+    <Compile Include="Entities\Way.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="PlanGenerator.cs" />
     <Compile Include="PlanResolver.cs" />

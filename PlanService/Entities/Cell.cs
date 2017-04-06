@@ -2,13 +2,15 @@
 {
     public class Cell
     {
-        public Cell(CellState cellState, int numberOfManHere)
+        public Cell(CellState cellState)
         {
             CellState = cellState;
-            NumberOfManHere = numberOfManHere;
         }
 
         public CellState CellState { get; set; }
         public int NumberOfManHere { get; set; }
+        public int GateCapasity { get; set; }
+
+        
     }
 }
