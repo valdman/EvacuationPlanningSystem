@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace PlanService.Entities
 {
-    public class Plan : IEnumerable<Cell>
+    public struct Plan : IEnumerable<Cell>
     {
         public Plan(int width, int height)
         {
@@ -31,10 +31,10 @@ namespace PlanService.Entities
             set => Cells[point.X, point.Y] = value;
         }
 
-        public Cell[,] Cells { get; }
+        public Cell[,] Cells { get; set; }
         public int Width { get; }
         public int Height { get; }
-        public Random RandomGenerator { get; }
+        public Random RandomGenerator { get; set; }
 
         public IEnumerator<Cell> GetEnumerator()
         {
@@ -46,6 +46,31 @@ namespace PlanService.Entities
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public Plan ShallowCopy()
+        {
+            return (Plan)this.MemberwiseClone();
+        }
+
+        public Plan DeepCopy()
+        {
+            var other = (Plan)this.MemberwiseClone();
+            other.Cells = new Cell[Width,Height];
+            for (var x = 0; x < Width; x++)
+            {
+                for (var y = 0; y < Height; y++)
+                {
+                    other.Cells[x, y] = new Cell
+                    {
+                        CellState = Cells[x, y].CellState,
+                        NumberOfManHere = Cells[x, y].NumberOfManHere,
+                        GateCapasity = Cells[x, y].GateCapasity
+                    };
+                }
+            }
+            other.RandomGenerator = new Random();
+            return other;
         }
     }
 }

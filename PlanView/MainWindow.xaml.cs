@@ -30,7 +30,7 @@ namespace EvacuationPlanningSystem
                 else
                 {
                     _planPresentor.RegeneratePlan(width, height);
-                    _planPresentor.DrawPlan();
+                    _planPresentor.Drawer.DrawPlan();
                 }
             };
 
@@ -42,8 +42,9 @@ namespace EvacuationPlanningSystem
                     heigthDifference > 10 ||
                     weightDifference > 10)
                 {
-                    _planPresentor.DrawPlan();
-                    _planPresentor.DrawGatesAndPeople();
+                    _planPresentor.Drawer.DrawPlan();
+                    _planPresentor.Drawer.DrawGatesAndPeople();
+                    _planPresentor.Drawer.DrawSolution();
                 }
                 _timeOffsetDueLastReload = DateTimeOffset.Now;
             };
@@ -56,7 +57,8 @@ namespace EvacuationPlanningSystem
                     var gatesCapasities = GateCapasities.Text.Split(',').Select(int.Parse).ToList();
 
                     _planPresentor.RunRandomSimulation(gatesCapasities, manCount);
-                    //_planPresentor.DrawSolution();
+                    _planPresentor.Drawer.DrawGatesAndPeople();
+                    _planPresentor.Drawer.DrawSolution();
                 }
                 catch (FormatException)
                 {

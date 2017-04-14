@@ -6,16 +6,11 @@ namespace PlanService
 {
     public class PlanResolver
     {
-        private readonly Plan _plan;
-
-        public PlanResolver(Plan plan)
+        public IEnumerable<Way> FindGateway(Plan plan, Point beginPoint)
         {
-            _plan = plan;
-        }
+            var planCopy = plan.DeepCopy();
 
-        public IEnumerable<Way> FindGateway(Point beginPoint)
-        {
-            foreach (var cell in _plan)
+            foreach (var cell in planCopy)
                 cell.CellState &= ~CellState.Visited;
 
             var ways = new List<Way>();
@@ -27,29 +22,29 @@ namespace PlanService
             while (queue.Count != 0)
             {
                 var here = queue.Dequeue();
-                _plan[here].CellState |= CellState.Visited;
+                planCopy[here].CellState |= CellState.Visited;
 
-                var gateCapasityHere = _plan[here].GateCapasity;
-                var manHere = _plan[beginPoint].NumberOfManHere;
+                var gateCapasityHere = planCopy[here].GateCapasity;
+                var manHere = planCopy[beginPoint].NumberOfManHere;
 
                 if (gateCapasityHere > 0)
                 {
                     if (manHere <= gateCapasityHere)
                     {
                         var endedWay = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
-                        endedWay.PeopleOnWay = _plan[beginPoint].NumberOfManHere;
-                        _plan[beginPoint].NumberOfManHere -= manHere;
-                        _plan[here].GateCapasity -= manHere;
+                        endedWay.PeopleOnWay = planCopy[beginPoint].NumberOfManHere;
+                        planCopy[beginPoint].NumberOfManHere -= manHere;
+                        planCopy[here].GateCapasity -= manHere;
                         ways.Add(endedWay);
                         break;
                     }
                     var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
                     wayToAnotherGate.PeopleOnWay = gateCapasityHere;
-                    _plan[beginPoint].NumberOfManHere -= gateCapasityHere;
+                    planCopy[beginPoint].NumberOfManHere -= gateCapasityHere;
                     ways.Add(wayToAnotherGate);
                 }
 
-                var neighbours = GetNeighbours(here);
+                var neighbours = GetNeighbours(planCopy, here);
                 foreach (var neighbour in neighbours)
                 {
                     backtrack.Add(neighbour, here);
@@ -76,32 +71,32 @@ namespace PlanService
         }
 
 
-        public IEnumerable<Point> GetNeighbours(Point cellToGetNeighbours)
+        public IEnumerable<Point> GetNeighbours(Plan plan, Point cellToGetNeighbours)
         {
-            var cellState = _plan[cellToGetNeighbours].CellState;
+            var cellState = plan[cellToGetNeighbours].CellState;
             if (!cellState.HasFlag(CellState.Left))
             {
                 var leftCell = new Point(cellToGetNeighbours.X - 1, cellToGetNeighbours.Y);
-                if (!_plan[leftCell].CellState.HasFlag(CellState.Visited))
+                if (!plan[leftCell].CellState.HasFlag(CellState.Visited))
                     yield return leftCell;
             }
 
             if (!cellState.HasFlag(CellState.Top))
             {
                 var topCell = new Point(cellToGetNeighbours.X, cellToGetNeighbours.Y - 1);
-                if (!_plan[topCell].CellState.HasFlag(CellState.Visited))
+                if (!plan[topCell].CellState.HasFlag(CellState.Visited))
                     yield return topCell;
             }
             if (!cellState.HasFlag(CellState.Right))
             {
                 var rightCell = new Point(cellToGetNeighbours.X + 1, cellToGetNeighbours.Y);
-                if (!_plan[rightCell].CellState.HasFlag(CellState.Visited))
+                if (!plan[rightCell].CellState.HasFlag(CellState.Visited))
                     yield return rightCell;
             }
             if (!cellState.HasFlag(CellState.Bottom))
             {
                 var bottomCell = new Point(cellToGetNeighbours.X, cellToGetNeighbours.Y + 1);
-                if (!_plan[bottomCell].CellState.HasFlag(CellState.Visited))
+                if (!plan[bottomCell].CellState.HasFlag(CellState.Visited))
                     yield return bottomCell;
             }
         }
