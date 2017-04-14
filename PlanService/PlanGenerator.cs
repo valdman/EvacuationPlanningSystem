@@ -14,7 +14,7 @@ namespace PlanService
         {
             var plan = new Plan(width, height);
 
-            VisitCell(plan, _randomGenerator.Next(width), _randomGenerator.Next(height));
+            VisitCell(plan, new Point(_randomGenerator.Next(width), _randomGenerator.Next(height)));
             return plan;
         }
 
