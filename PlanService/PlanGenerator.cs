@@ -72,17 +72,17 @@ namespace PlanService
                 };
         }
 
-        private void VisitCell(Plan plan, int x, int y)
+        private void VisitCell(Plan plan, Point beginPoint)
         {
-            plan[x, y].CellState |= CellState.Visited;
-            foreach (var p in GetNeighboursOfCell(plan, new Point(x, y))
+            plan[beginPoint].CellState |= CellState.Visited;
+            foreach (var p in GetNeighboursOfCell(plan, beginPoint)
                 .Shuffle(_randomGenerator)
                 .Where(z => !plan[z.Neighbour.X, z.Neighbour.Y]
                     .CellState.HasFlag(CellState.Visited)))
             {
-                plan[x, y].CellState -= p.Wall;
+                plan[beginPoint].CellState -= p.Wall;
                 plan[p.Neighbour.X, p.Neighbour.Y].CellState -= p.Wall.OppositeWall();
-                VisitCell(plan, p.Neighbour.X, p.Neighbour.Y);
+                VisitCell(plan, p.Neighbour);
             }
         }
 
