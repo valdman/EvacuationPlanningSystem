@@ -6,7 +6,7 @@ namespace PlanService
 {
     public class PlanResolver
     {
-        public IEnumerable<Way> FindGateway(Plan plan, Point beginPoint)
+        public IEnumerable<Way> CalculateSinkWeigth(Plan plan, Point beginPoint)
         {
             var planCopy = plan.DeepCopy();
 
