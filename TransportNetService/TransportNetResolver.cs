@@ -3,30 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportNetService.Application;
 using TransportNetService.Entities;
 
 namespace TransportNetService
 {
-    class TransportNetResolver : ITransportNetResolver
+    public class TransportNetResolver : ITransportNetResolver
     {
-        public TransportTable GetTransportTable()
+       
+
+        public TransportNetResolver(TransportTable table)
+        {
+            optimizer = new PotencialMethodOptimizer();
+            planBuilder = new NorthWestPlanBuilder();
+
+            TransportTable rawTable = _isSolvable(table) ? table : _toClosed(table);
+
+            resultTable = optimizer.optimize(planBuilder.Build(rawTable));
+        }
+
+        public TransportNetResolver()
+        {
+        }
+
+        public TransportTable GetResultTable()
         {
             return resultTable;
         }
 
-        public TransportNetResolver(TransportTable table)
-        {
-            if (_isSolvable(table))
-            {
-                this.rawTable = table;
-            }
-            else
-            {
-                this.rawTable = _toClosed(table);
-            }
-        }
-
-               
         private bool _isSolvable(TransportTable table)
         {
             var SourcesValue = table.Sources.Sum(node => node.Value);
@@ -38,79 +42,44 @@ namespace TransportNetService
         private TransportTable _toClosed(TransportTable table)
         {
 
-            this.sources = sources;
-            this.sinks = sinks;
+                Node[] sources = table.Sources;
+                Node[] sinks = table.Sinks;
+                int[,] costs;
 
-            if (!_isSolvable(sources, sinks))
-            {
+            
                 var difference = sources.Sum(node => node.Value) - sinks.Sum(node => node.Value);
                 Node fictionNode = new Node(-1, Math.Abs(difference));
                 if (difference < 0)
                 {
-                    this.sinks.Concat(new Node[] { fictionNode });
-                    plan = new PlanElement[this.sources.Length, this.sinks.Length];
-                    for (int i = 0; i < this.sources.Length; i++)
-                    {
-                        for (int j = 0; j < this.sinks.Length - 1; j++)
-                        {
-                            plan[i, j] = new PlanElement()
-                            {
-                                Cost = costs[i, j]
-                            };
-                        }
-
-                        plan[i, this.sinks.Length] = new PlanElement()
-                        {
-                            Cost = 0
-                        };
-
-                    }
+                    sinks.Concat(new Node[] { fictionNode });
+                    
                 }
                 else
                 {
-                    this.sources.Concat(new Node[] { fictionNode });
-                    plan = new PlanElement[this.sources.Length, this.sinks.Length];
-                    for (int i = 0; i < this.sources.Length - 1; i++)
-                    {
-                        for (int j = 0; j < this.sinks.Length; j++)
-                        {
-                            plan[i, j] = new PlanElement()
-                            {
-                                Cost = costs[i, j]
-                            };
-                            plan[this.sources.Length, j] = new PlanElement()
-                            {
-                                Cost = 0
-                            };
-
-                        }
-
-                    }
+                    sources.Concat(new Node[] { fictionNode });
+                    
                 }
-            }
-            else
-            {
-                plan = new PlanElement[this.sources.Length, this.sinks.Length];
-                for (int i = 0; i < this.sources.Length; i++)
+                
+                costs = new int[sources.Length, sinks.Length];
+
+                for (int i = 0; i < sources.Length; i++)
                 {
-                    for (int j = 0; j < this.sinks.Length; j++)
+                    for (int j = 0; j < sinks.Length; j++)
                     {
-                        plan[i, j] = new PlanElement()
-                        {
-                            Cost = costs[i, j]
-                        };
+                        costs[i, j] = (i < table.Sources.Length && j < table.Sinks.Length) ? table.Plan[i, j].Cost : 0;
                     }
                 }
-            }
 
+                return new TransportTable(sources, sinks, costs);
+                
         }
 
 
 
-        private TransportTable rawTable;
         private TransportTable resultTable;
         private IOptimizer optimizer;
         private IPlanBuilder planBuilder;
+        
     }
 
 }

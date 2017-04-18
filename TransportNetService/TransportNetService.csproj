@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -40,12 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\ITransportNetResolver.cs" />
     <Compile Include="Entities\Node.cs" />
     <Compile Include="Entities\PlanElement.cs" />
     <Compile Include="Entities\TransportTable.cs" />
-    <Compile Include="ITransportCalculation.cs" />
-    <Compile Include="ITransportNetResolver.cs" />
+    <Compile Include="IOptimizer.cs" />
+    <Compile Include="IPlanBuilder.cs" />
+    <Compile Include="NorthWestPlanBuilder.cs" />
+    <Compile Include="PotencialMethodOptimizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransportNetResolver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

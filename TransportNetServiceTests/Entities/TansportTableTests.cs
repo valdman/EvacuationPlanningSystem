@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TransportNetService;
+using TransportNetService.Application;
 using TransportNetService.Entities;
 
 namespace TransportNetService.Tests
@@ -14,10 +15,9 @@ namespace TransportNetService.Tests
     [TestClass()]
     public class TansportTableTests
     {
-        private TansportTable _table;
+        private TransportTable _table;
 
         
-
         [TestMethod()]
         public void TansportTableTest()
         {
@@ -46,15 +46,23 @@ namespace TransportNetService.Tests
                 }
             }
 
+            _table = new TransportTable(sources, sinks, costs);
+
             //act
-            
-            _table = new TansportTable(sources, sinks, costs);
+
+            ITransportNetResolver reslolver = new TransportNetResolver(_table);
+
+            _table = reslolver.GetResultTable();
+
             for (int i = 0; i < sources.Length; i++)
             {
                 for (int j = 0; j < sinks.Length; j++)
                 {
-                    if(_table.Plan[i, j].Delivery != 0)
-                    Debug.WriteLine($"humans{i} -> exit{j} ({_table.Plan[i, j].Delivery})");
+                    if (_table.Plan[i, j].Delivery != 0)
+                    {
+
+                        Debug.WriteLine($"humans{i} ({_table.Sources[i].Potencial}) -> exit{j} ({_table.Sinks[j].Potencial}) (({_table.Plan[i, j].Delivery}))");
+                    }
                 }
             }
 
