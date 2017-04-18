@@ -22,28 +22,34 @@ namespace TransportNetService.Tests
         public void TansportTableTest()
         {
             //arrange
-            Node[] sources = new Node[4]
-            {
-                new Node(1, 2), 
-                new Node(2, 1), 
-                new Node(3, 1), 
-                new Node(4, 1)
-            };
-            Node[] sinks = new Node[4]
-            {
-                new Node(1, 1),
-                new Node(2, 1),
-                new Node(3, 2),
-                new Node(4, 1)
-            };
-            int[,] costs = new int[sources.Length, sinks.Length];
             Random rand = new Random();
+            Node[] sources = new Node[rand.Next(3, 8)];
+            Node[] sinks = new Node[rand.Next(3, 8)];
+
             for (int i = 0; i < sources.Length; i++)
             {
-                for (int j = 0; j < sinks.Length; j++)
+                sources[i] = new Node(i, rand.Next(1, 4));
+            }
+
+            for (int i = 0; i < sinks.Length; i++)
+            {
+                sinks[i] = new Node(i, rand.Next(1, 4));
+            }
+
+            int[,] costs = new int[sources.Length, sinks.Length];
+           
+            for (int i = 0; i < sources.Length; i++)
+            {
+                Debug.Write($"human{sources[i].Id} ({sources[i].Value}) ");
+                Debug.WriteLine("");
+                int j;
+
+                for (j = 0; j < sinks.Length; j++)
                 {
                     costs[i, j] = rand.Next(1, 6);
+                    Debug.Write($"{costs[i, j]} for exit{sinks[j].Id} ({sinks[j].Value})");
                 }
+                Debug.WriteLine("");
             }
 
             _table = new TransportTable(sources, sinks, costs);
@@ -54,13 +60,13 @@ namespace TransportNetService.Tests
 
             _table = reslolver.GetResultTable();
 
+            Debug.WriteLine("");
             for (int i = 0; i < sources.Length; i++)
             {
                 for (int j = 0; j < sinks.Length; j++)
                 {
                     if (_table.Plan[i, j].Delivery != 0)
                     {
-
                         Debug.WriteLine($"humans{i} ({_table.Sources[i].Potencial}) -> exit{j} ({_table.Sinks[j].Potencial}) (({_table.Plan[i, j].Delivery}))");
                     }
                 }

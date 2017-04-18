@@ -65,8 +65,8 @@ namespace TransportNetService
             {
                 table.Sinks[basicArr[i].Y].Potencial = table.Plan[basicArr[i].X, basicArr[i].Y].Cost -
                                                        table.Sources[basicArr[i].X].Potencial;
-                table.Sources[basicArr[i].Y].Potencial = table.Plan[basicArr[i].X, basicArr[i].Y].Cost -
-                                                       table.Sinks[basicArr[i].X].Potencial;
+                table.Sources[basicArr[i].X].Potencial = table.Plan[basicArr[i].X, basicArr[i].Y].Cost -
+                                                       table.Sinks[basicArr[i].Y].Potencial;
             }
             return table;
 
