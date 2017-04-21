@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TransportNetService;
 using TransportNetService.Application;
 using TransportNetService.Entities;
 
@@ -47,7 +46,7 @@ namespace TransportNetService.Tests
                 for (j = 0; j < sinks.Length; j++)
                 {
                     costs[i, j] = rand.Next(1, 6);
-                    Debug.Write($"{costs[i, j]} for exit{sinks[j].Id} ({sinks[j].Value})");
+                    Debug.Write($"{costs[i, j]} for exit{sinks[j].Id} ({sinks[j].Value} )");
                 }
                 Debug.WriteLine("");
             }
@@ -61,13 +60,18 @@ namespace TransportNetService.Tests
             _table = reslolver.GetResultTable();
 
             Debug.WriteLine("");
-            for (int i = 0; i < sources.Length; i++)
+
+            for (int i = 0; i < _table.Sources.Length; i++)
             {
-                for (int j = 0; j < sinks.Length; j++)
+                for (int j = 0; j < _table.Sinks.Length; j++)
                 {
-                    if (_table.Plan[i, j].Delivery != 0)
+                    if (_table.Plan[i, j].Delivery != 0 && _table.Sinks[j].Id != -1 && _table.Sources[i].Id != -1)
                     {
-                        Debug.WriteLine($"humans{i} ({_table.Sources[i].Potencial}) -> exit{j} ({_table.Sinks[j].Potencial}) (({_table.Plan[i, j].Delivery}))");
+                        Debug.WriteLine($"humans{i}  -> exit{j} (({_table.Plan[i, j].Delivery}))");
+
+                    } else if (_table.Sinks[j].Id < 0 && _table.Plan[i, j].Delivery != 0)
+                    {
+                        Debug.WriteLine($"humans{i} проебались (({_table.Plan[i, j].Delivery}))");
                     }
                 }
             }

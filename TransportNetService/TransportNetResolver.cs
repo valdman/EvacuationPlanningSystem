@@ -22,9 +22,6 @@ namespace TransportNetService
             resultTable = optimizer.optimize(planBuilder.Build(rawTable));
         }
 
-        public TransportNetResolver()
-        {
-        }
 
         public TransportTable GetResultTable()
         {
@@ -42,8 +39,8 @@ namespace TransportNetService
         private TransportTable _toClosed(TransportTable table)
         {
 
-                Node[] sources = table.Sources;
-                Node[] sinks = table.Sinks;
+                List<Node> sources = table.Sources.ToList();
+                List<Node> sinks = table.Sinks.ToList();
                 int[,] costs;
 
             
@@ -51,20 +48,20 @@ namespace TransportNetService
                 Node fictionNode = new Node(-1, Math.Abs(difference));
                 if (difference < 0)
                 {
-                    sinks.Concat(new Node[] { fictionNode });
+                    sources.Add(fictionNode);
                     
                 }
                 else
                 {
-                    sources.Concat(new Node[] { fictionNode });
+                    sinks.Add(fictionNode);
                     
                 }
                 
-                costs = new int[sources.Length, sinks.Length];
+                costs = new int[sources.Count, sinks.Count];
 
-                for (int i = 0; i < sources.Length; i++)
+                for (int i = 0; i < sources.Count; i++)
                 {
-                    for (int j = 0; j < sinks.Length; j++)
+                    for (int j = 0; j < sinks.Count; j++)
                     {
                         costs[i, j] = (i < table.Sources.Length && j < table.Sinks.Length) ? table.Plan[i, j].Cost : 0;
                     }

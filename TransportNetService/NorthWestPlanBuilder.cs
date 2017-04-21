@@ -20,20 +20,29 @@ namespace TransportNetService
             {
                 try
                 {
-                    if (table.Sources[col].Value == 0)
+                    if (table.Sources[col].Value == 0 && (col + 1) < sourcesLength)
                     {
                         col++;
                     }
-                    if (table.Sinks[row].Value == 0)
+                    if (table.Sinks[row].Value == 0 && (row + 1) < sinksLength)
                     {
                         row++;
                     }
-                    table.Plan[col, row].Delivery = Math.Min(table.Sources[col].Value, table.Sinks[row].Value);
-                    table.Sources[col].Value -= table.Plan[col, row].Delivery;
-                    table.Sinks[row].Value -= table.Plan[col, row].Delivery;
+                    if (table.Sinks[row].Value == 0 && table.Sources[col].Value == 0)
+                    {
+                        col++;
+                        row++;
+                    }
+
+                    var thisDelivery = Math.Min(table.Sources[col].Value, table.Sinks[row].Value);
+                    table.Plan[col, row].Delivery = thisDelivery;
+                    table.Sources[col].Value -= thisDelivery;
+                    table.Sinks[row].Value -= thisDelivery;
+
                 }
                 catch (IndexOutOfRangeException)
                 {
+     
                     break;
                 }
 

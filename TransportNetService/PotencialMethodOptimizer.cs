@@ -1,9 +1,11 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TransportNetService.Entities;
 
 namespace TransportNetService
 {
@@ -17,6 +19,7 @@ namespace TransportNetService
                 _addRandomBasicCell(ref basicCells, table);
             }
 
+            
             return _calculatePotencials(table, basicCells);
         }
 
@@ -72,6 +75,64 @@ namespace TransportNetService
 
         }
 
-       
+        private TransportTable findOptimalSolvation(TransportTable table, IEnumerable<Point> basicCells)
+        {
+            optimizeNode[,] optimizeMatrix = new optimizeNode[table.Sources.Length, table.Sinks.Length];
+
+            foreach (var basicCell in basicCells)
+            {
+                optimizeNode newNode = new optimizeNode();
+                newNode.mark = 0;
+                optimizeMatrix[basicCell.X, basicCell.Y] = newNode;
+            }
+
+            bool isOptimal = true;
+
+            for (int i = 0; i < table.Sources.Length; i++)
+            {
+                for (int j = 0; j < table.Sinks.Length; j++)
+                {
+                    if (optimizeMatrix[i,j] != null)
+                    {
+                        optimizeNode newNode = new optimizeNode();
+                        newNode.mark = table.Plan[i,j].Cost - table.Sources[i].Potencial - table.Sinks[j].Potencial;
+                        optimizeMatrix[i, j] = newNode;
+
+                        if (newNode.mark < 0)
+                        {
+                            isOptimal = false;
+                        }
+                        
+                    }
+                }
+            }
+
+            if (isOptimal)
+            {
+                return table;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+        }
+
+        private TransportTable rebuildTable(TransportTable table, optimizeNode[] optimizeMatrix)
+        {
+            throw new NotImplementedException();
+        }
+
     }
+
+    class optimizeNode
+    {
+        public int mark { get; set; }
+        public enum sign
+        {
+            min,plus
+        }
+    }
+
+    
 }
