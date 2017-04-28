@@ -47,7 +47,7 @@ namespace PlanPresentation
                 if (cell.NumberOfManHere <= 0) continue;
 
                 var beginPoint = new System.Drawing.Point(x, y);
-                foreach (var solution in _planResolver.CalculateSinkWeigth(CurrentPlan, beginPoint))
+                foreach (var solution in _planResolver.ResolvePlan(CurrentPlan))
                     CurrentSolution.Add(solution);
             }
 

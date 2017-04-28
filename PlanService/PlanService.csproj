@@ -50,5 +50,11 @@
     <Compile Include="PlanResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TransportNetService\TransportNetService.csproj">
+      <Project>{A43AEE9B-0A80-47DE-BDFD-8DCE4F39826B}</Project>
+      <Name>TransportNetService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
