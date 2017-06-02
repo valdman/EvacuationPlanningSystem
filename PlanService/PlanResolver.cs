@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using PlanService.Entities;
 
@@ -6,11 +7,25 @@ namespace PlanService
 {
     public class PlanResolver
     {
-        public IEnumerable<Way> FindGateway(Plan plan, Point beginPoint)
+        public IEnumerable<Way> CalculateSinkWeigth(Plan plan, Point beginPoint)
         {
-            var planCopy = plan.DeepCopy();
+            var commutationTable = new List<>>();
+            for (var x = 0; x < plan.Width; x++)
+            {
+                for (var y = 0; y < plan.Height; y++)
+                {
+                    ifplan[x, y]
+                }
+            }
+            var ways = GetWaysToAllGatesFromPoint(plan, beginPoint);
 
-            foreach (var cell in planCopy)
+            return ways;
+        }
+
+        private List<Way> GetWaysToAllGatesFromPoint(Plan plan, Point beginPoint)
+        {
+
+            foreach (var cell in plan)
                 cell.CellState &= ~CellState.Visited;
 
             var ways = new List<Way>();
@@ -22,29 +37,18 @@ namespace PlanService
             while (queue.Count != 0)
             {
                 var here = queue.Dequeue();
-                planCopy[here].CellState |= CellState.Visited;
+                plan[here].CellState |= CellState.Visited;
 
-                var gateCapasityHere = planCopy[here].GateCapasity;
-                var manHere = planCopy[beginPoint].NumberOfManHere;
+                var gateCapasityHere = plan[here].GateCapasity;
 
                 if (gateCapasityHere > 0)
                 {
-                    if (manHere <= gateCapasityHere)
-                    {
-                        var endedWay = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
-                        endedWay.PeopleOnWay = planCopy[beginPoint].NumberOfManHere;
-                        planCopy[beginPoint].NumberOfManHere -= manHere;
-                        planCopy[here].GateCapasity -= manHere;
-                        ways.Add(endedWay);
-                        break;
-                    }
-                    var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
+                    var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint);
                     wayToAnotherGate.PeopleOnWay = gateCapasityHere;
-                    planCopy[beginPoint].NumberOfManHere -= gateCapasityHere;
                     ways.Add(wayToAnotherGate);
                 }
 
-                var neighbours = GetNeighbours(planCopy, here);
+                var neighbours = GetNeighbours(plan, here);
                 foreach (var neighbour in neighbours)
                 {
                     backtrack.Add(neighbour, here);
@@ -52,10 +56,14 @@ namespace PlanService
                 }
             }
 
+
+            foreach (var cell in plan)
+                cell.CellState &= ~CellState.Visited;
+
             return ways;
         }
 
-        private Way GetWayByBacktrack(Dictionary<Point, Point> backtrack, Point endPoint, Point beginPoint, int manHere)
+        private Way GetWayByBacktrack(Dictionary<Point, Point> backtrack, Point endPoint, Point beginPoint)
         {
             var way = new Way();
             var here = endPoint;
@@ -66,10 +74,8 @@ namespace PlanService
             }
             way.WayOut.Add(beginPoint);
             way.WayOut.Reverse();
-            way.PeopleOnWay = manHere;
             return way;
         }
-
 
         public IEnumerable<Point> GetNeighbours(Plan plan, Point cellToGetNeighbours)
         {
