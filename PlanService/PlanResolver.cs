@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using PlanService.Entities;
 
@@ -7,24 +6,8 @@ namespace PlanService
 {
     public class PlanResolver
     {
-        public IEnumerable<Way> CalculateSinkWeigth(Plan plan, Point beginPoint)
+        public IEnumerable<Way> FindGateway(Plan plan, Point beginPoint)
         {
-            var commutationTable = new List<>>();
-            for (var x = 0; x < plan.Width; x++)
-            {
-                for (var y = 0; y < plan.Height; y++)
-                {
-                    ifplan[x, y]
-                }
-            }
-            var ways = GetWaysToAllGatesFromPoint(plan, beginPoint);
-
-            return ways;
-        }
-
-        private List<Way> GetWaysToAllGatesFromPoint(Plan plan, Point beginPoint)
-        {
-
             foreach (var cell in plan)
                 cell.CellState &= ~CellState.Visited;
 
@@ -40,11 +23,22 @@ namespace PlanService
                 plan[here].CellState |= CellState.Visited;
 
                 var gateCapasityHere = plan[here].GateCapasity;
+                var manHere = plan[beginPoint].NumberOfManHere;
 
                 if (gateCapasityHere > 0)
                 {
-                    var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint);
+                    if (manHere <= gateCapasityHere)
+                    {
+                        var endedWay = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
+                        endedWay.PeopleOnWay = plan[beginPoint].NumberOfManHere;
+                        plan[beginPoint].NumberOfManHere -= manHere;
+                        plan[here].GateCapasity -= manHere;
+                        ways.Add(endedWay);
+                        break;
+                    }
+                    var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
                     wayToAnotherGate.PeopleOnWay = gateCapasityHere;
+                    plan[beginPoint].NumberOfManHere -= gateCapasityHere;
                     ways.Add(wayToAnotherGate);
                 }
 
@@ -56,14 +50,10 @@ namespace PlanService
                 }
             }
 
-
-            foreach (var cell in plan)
-                cell.CellState &= ~CellState.Visited;
-
             return ways;
         }
 
-        private Way GetWayByBacktrack(Dictionary<Point, Point> backtrack, Point endPoint, Point beginPoint)
+        private Way GetWayByBacktrack(Dictionary<Point, Point> backtrack, Point endPoint, Point beginPoint, int manHere)
         {
             var way = new Way();
             var here = endPoint;
@@ -74,8 +64,10 @@ namespace PlanService
             }
             way.WayOut.Add(beginPoint);
             way.WayOut.Reverse();
+            way.PeopleOnWay = manHere;
             return way;
         }
+
 
         public IEnumerable<Point> GetNeighbours(Plan plan, Point cellToGetNeighbours)
         {

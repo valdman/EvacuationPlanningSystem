@@ -40,6 +40,7 @@ namespace PlanPresentation
         private void ResolvePlan()
         {
             CurrentSolution = new List<Way>();
+            var currentPlanCopy = CurrentPlan.DeepCopy();
             for (var x = 0; x < CurrentPlan.Width; x++)
             for (var y = 0; y < CurrentPlan.Height; y++)
             {
@@ -47,7 +48,7 @@ namespace PlanPresentation
                 if (cell.NumberOfManHere <= 0) continue;
 
                 var beginPoint = new System.Drawing.Point(x, y);
-                foreach (var solution in _planResolver.ResolvePlan(CurrentPlan))
+                foreach (var solution in _planResolver.FindGateway(currentPlanCopy, beginPoint))
                     CurrentSolution.Add(solution);
             }
 
