@@ -1,33 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TransportNetService
 {
-    class NorthWestPlanBuilder : IPlanBuilder
-    {   
-
+    internal class NorthWestPlanBuilder : IPlanBuilder
+    {
         public TransportTable Build(TransportTable table)
         {
-            int col = 0;
-            int row = 0;
-            int sourcesLength = table.Sources.Length;
-            int sinksLength = table.Sinks.Length;
+            var col = 0;
+            var row = 0;
+            var sourcesLength = table.Sources.Length;
+            var sinksLength = table.Sinks.Length;
 
             while (col < sourcesLength && row < sinksLength)
-            {
                 try
                 {
-                    if (table.Sources[col].Value == 0 && (col + 1) < sourcesLength)
-                    {
+                    if (table.Sources[col].Value == 0 && col + 1 < sourcesLength)
                         col++;
-                    }
-                    if (table.Sinks[row].Value == 0 && (row + 1) < sinksLength)
-                    {
+                    if (table.Sinks[row].Value == 0 && row + 1 < sinksLength)
                         row++;
-                    }
                     if (table.Sinks[row].Value == 0 && table.Sources[col].Value == 0)
                     {
                         col++;
@@ -38,15 +28,11 @@ namespace TransportNetService
                     table.Plan[col, row].Delivery = thisDelivery;
                     table.Sources[col].Value -= thisDelivery;
                     table.Sinks[row].Value -= thisDelivery;
-
                 }
                 catch (IndexOutOfRangeException)
                 {
-     
                     break;
                 }
-
-            }
 
             return table;
         }
