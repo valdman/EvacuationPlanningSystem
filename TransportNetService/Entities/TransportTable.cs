@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TransportNetService.Entities;
 
 namespace TransportNetService
 {
     public class TransportTable
     {
+        public PlanElement[,] Plan;
+        public Node[] Sinks;
+
+        public Node[] Sources;
 
         public TransportTable(IEnumerable<Node> sources, IEnumerable<Node> sinks, int[,] costs)
         {
@@ -19,21 +18,33 @@ namespace TransportNetService
 
             Plan = new PlanElement[Sources.Length, Sinks.Length];
 
-            for (int i = 0; i < Sources.Length; i++)
+            for (var i = 0; i < Sources.Length; i++)
+            for (var j = 0; j < Sinks.Length; j++)
             {
-                for (int j = 0; j < Sinks.Length; j++)
-                {
-                    var planElement = new PlanElement();
-                    planElement.Cost = costs[i, j];
-                    Plan[i, j] = planElement;
-                }
+                var planElement = new PlanElement();
+                planElement.Cost = costs[i, j];
+                planElement.Delivery = 0;
+                Plan[i, j] = planElement;
             }
-
         }
 
-       
-        public Node[] Sources;
-        public Node[] Sinks;
-        public PlanElement[,] Plan;
+        protected TransportTable(TransportTable toCopy)
+        {
+            Sources = toCopy.Sources;
+            Sinks = toCopy.Sinks;
+            Plan = toCopy.Plan;
+        }
+
+        public int ZFuncMinCost()
+        {
+            var cost = 0;
+            for (var i = 0; i < Sources.Length; i++)
+            for (var j = 0; j < Sinks.Length; j++)
+            {
+                var currentNode = Plan[i, j];
+                cost += currentNode.Delivery * currentNode.Cost;
+            }
+            return cost;
+        }
     }
 }

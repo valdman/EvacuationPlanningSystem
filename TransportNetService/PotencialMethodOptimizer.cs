@@ -1,138 +1,217 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TransportNetService.Entities;
 
 namespace TransportNetService
 {
-    class PotencialMethodOptimizer : IOptimizer
+    internal class PotencialMethodOptimizer : IOptimizer
     {
+        [Flags]
+        public enum Direction
+        {
+            Bottom = 0,
+            Right = 2,
+            Left = 3,
+            Top = 4
+        }
+
         public TransportTable optimize(TransportTable table)
         {
-            List<Point> basicCells = _findBasicCells(table);
-            while (_isDegeneracy(table, basicCells))
-            {
-                _addRandomBasicCell(ref basicCells, table);
-            }
+            var workTable = new optimizingTable(table);
 
-            
-            return _calculatePotencials(table, basicCells);
+
+            while (!workTable.isOptimal())
+                workTable = rebuildTable(workTable);
+            workTable.updatePlan();
+            return workTable;
         }
 
-        private List<Point> _findBasicCells(TransportTable table)
-        {
-            List<Point> basicCells = new List<Point>();
 
-            for (int i = 0; i < table.Sources.Length; i++)
+        private optimizingTable rebuildTable(optimizingTable table)
+        {
+            var cycle = moveToCycle(table.problemCell, table);
+            var currentFlag = 1;
+
+
+            var minMarkedValue = Math.Abs(cycle.Min(p => table.OptimizingPlan[p.X, p.Y].mark));
+
+            foreach (var point in cycle)
             {
-                for (int j = 0; j < table.Sinks.Length; j++)
+                table.OptimizingPlan[point.X, point.Y].Delivery +=
+                    currentFlag * minMarkedValue;
+                currentFlag *= -1;
+            }
+
+            return new optimizingTable(table);
+        }
+
+        private List<Point> moveToCycle(Point pointer, optimizingTable table)
+        {
+            var iterationsLimit = table.Sources.Length * table.Sinks.Length;
+            var cycle = new List<Point>();
+
+            if (horizontalCycleFound(table.problemCell, iterationsLimit, table, ref cycle))
+                if (cycle.Count < 4)
+                    throw new Exception("cycle cells count less than 4");
+                else
+                    return cycle;
+            throw new Exception("cannot build cycle");
+        }
+
+
+        private bool horizontalCycleFound(Point pointer, int itherationsLimit, optimizingTable table,
+            ref List<Point> cycle)
+        {
+            --itherationsLimit;
+            if (itherationsLimit == 0)
+                throw new StackOverflowException();
+            for (var j = 0; j < table.Sinks.Length; ++j)
+            {
+                if (j == pointer.Y) continue;
+                if (!table.basicCells.Exists(p => p.X == pointer.X && p.Y == j)) continue;
+                if (verticalCycleFound(new Point(pointer.X, j), table, ref cycle, itherationsLimit))
                 {
-                    if (table.Plan[i, j].Delivery != 0)
-                    {
-                        basicCells.Add(new Point(i, j));
-                    }
+                    cycle.Add(new Point(pointer.X, j));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool verticalCycleFound(Point pointer, optimizingTable table, ref List<Point> cycle,
+            int itherationLimit)
+        {
+            for (var i = 0; i < table.Sources.Length; i++)
+            {
+                if (table.problemCell.X == pointer.X && table.problemCell.Y == pointer.Y)
+                {
+                    cycle.Add(new Point(i, pointer.Y));
+                    return true;
+                }
+                if (i == pointer.X) continue;
+                if (!table.basicCells.Exists(p => p.Y == pointer.Y && p.X == i)) continue;
+                if (horizontalCycleFound(new Point(i, pointer.Y), itherationLimit, table, ref cycle))
+                {
+                    cycle.Add(new Point(i, pointer.Y));
+                    return true;
                 }
             }
 
-            return basicCells;
+            return false;
         }
 
-        private bool _isDegeneracy(TransportTable table, IEnumerable<Point> basicCells)
+
+        private class optimizingCell : PlanElement
         {
-            return basicCells.Count() != (table.Sources.Length + table.Sinks.Length - 1);
+            public bool visited;
+            public int mark { get; set; }
+
+            public int sign { get; set; }
         }
 
-        private void _addRandomBasicCell(ref List<Point> basicCells, TransportTable table)
+        private class optimizingTable : TransportTable
         {
-            var i = 0;
-            var j = 0;
-            var randomGenerator = new Random();
-            while (basicCells.Exists(cell => cell.X == i && cell.Y == j))
+            public readonly List<Point> basicCells;
+
+            public readonly optimizingCell[,] OptimizingPlan;
+            public Point problemCell;
+
+            public optimizingTable(TransportTable toCopy) : base(toCopy)
             {
-                i = randomGenerator.Next(0, table.Sources.Length);
-                j = randomGenerator.Next(0, table.Sinks.Length);
-            }
-            basicCells.Add(new Point(i, j));
-        }
-
-        private TransportTable _calculatePotencials(TransportTable table, IEnumerable<Point> basicCells)
-        {
-            table.Sources[0].Potencial = 0;
-
-            var basicArr = basicCells.ToArray();
-            for (int i = 0; i < basicArr.Length; i++)
-            {
-                table.Sinks[basicArr[i].Y].Potencial = table.Plan[basicArr[i].X, basicArr[i].Y].Cost -
-                                                       table.Sources[basicArr[i].X].Potencial;
-                table.Sources[basicArr[i].X].Potencial = table.Plan[basicArr[i].X, basicArr[i].Y].Cost -
-                                                       table.Sinks[basicArr[i].Y].Potencial;
-            }
-            return table;
-
-        }
-
-        private TransportTable findOptimalSolvation(TransportTable table, IEnumerable<Point> basicCells)
-        {
-            optimizeNode[,] optimizeMatrix = new optimizeNode[table.Sources.Length, table.Sinks.Length];
-
-            foreach (var basicCell in basicCells)
-            {
-                optimizeNode newNode = new optimizeNode();
-                newNode.mark = 0;
-                optimizeMatrix[basicCell.X, basicCell.Y] = newNode;
-            }
-
-            bool isOptimal = true;
-
-            for (int i = 0; i < table.Sources.Length; i++)
-            {
-                for (int j = 0; j < table.Sinks.Length; j++)
+                OptimizingPlan = new optimizingCell[toCopy.Sources.Length, toCopy.Sinks.Length];
+                for (var i = 0; i < toCopy.Sources.Length; i++)
+                for (var j = 0; j < toCopy.Sinks.Length; j++)
                 {
-                    if (optimizeMatrix[i,j] != null)
-                    {
-                        optimizeNode newNode = new optimizeNode();
-                        newNode.mark = table.Plan[i,j].Cost - table.Sources[i].Potencial - table.Sinks[j].Potencial;
-                        optimizeMatrix[i, j] = newNode;
+                    var currentCell = toCopy.Plan[i, j];
+                    var newCell = new optimizingCell {Cost = currentCell.Cost, Delivery = currentCell.Delivery};
+                    OptimizingPlan[i, j] = newCell;
+                }
+                basicCells = findBasicCells();
+                while (isDegeneracy())
+                    addRandomBasicCell();
+                calculatePotencials();
+            }
 
-                        if (newNode.mark < 0)
+            private bool isDegeneracy()
+            {
+                return basicCells.Count() != Sources.Length + Sinks.Length - 1;
+            }
+
+            private void addRandomBasicCell()
+            {
+                var i = 0;
+                var j = 0;
+                var randomGenerator = new Random();
+                while (basicCells.Exists(cell => cell.X == i && cell.Y == j))
+                {
+                    i = randomGenerator.Next(0, Sources.Length);
+                    j = randomGenerator.Next(0, Sinks.Length);
+                }
+                basicCells.Add(new Point(i, j));
+            }
+
+            private List<Point> findBasicCells()
+            {
+                var _basicCells = new List<Point>();
+
+                for (var i = 0; i < Sources.Length; i++)
+                for (var j = 0; j < Sinks.Length; j++)
+                    if (Plan[i, j].Delivery != 0)
+                    {
+                        _basicCells.Add(new Point(i, j));
+                        OptimizingPlan[i, j].mark = 0;
+                    }
+
+                return _basicCells;
+            }
+
+            private void calculatePotencials()
+            {
+                Sources[0].Potencial = 0;
+
+                var basicArr = basicCells.ToArray();
+                for (var i = 0; i < basicArr.Length; i++)
+                {
+                    Sinks[basicArr[i].Y].Potencial = Plan[basicArr[i].X, basicArr[i].Y].Cost -
+                                                     Sources[basicArr[i].X].Potencial;
+
+                    Sources[basicArr[i].X].Potencial = Plan[basicArr[i].X, basicArr[i].Y].Cost -
+                                                       Sinks[basicArr[i].Y].Potencial;
+                }
+            }
+
+            private void setMarks()
+            {
+                var minMarkCell = new Point();
+                var minMark = int.MaxValue;
+                for (var i = 0; i < Sources.Length; i++)
+                for (var j = 0; j < Sinks.Length; j++)
+                    if (basicCells.Exists(cell => cell.X == i && cell.Y == j))
+                    {
+                        OptimizingPlan[i, j].mark = OptimizingPlan[i, j].Cost - Sources[i].Potencial -
+                                                    Sinks[j].Potencial;
+                        if (OptimizingPlan[i, j].mark < minMark)
                         {
-                            isOptimal = false;
+                            minMarkCell.X = i;
+                            minMarkCell.Y = j;
                         }
-                        
                     }
-                }
+                if (minMark != int.MaxValue)
+                    problemCell = minMarkCell;
             }
 
-            if (isOptimal)
+            public bool isOptimal()
             {
-                return table;
+                setMarks();
+                return problemCell.IsEmpty;
             }
-            else
+
+            public void updatePlan()
             {
-                throw new NotImplementedException();
+                Plan = OptimizingPlan;
             }
-
-        }
-
-        private TransportTable rebuildTable(TransportTable table, optimizeNode[] optimizeMatrix)
-        {
-            throw new NotImplementedException();
-        }
-
-    }
-
-    class optimizeNode
-    {
-        public int mark { get; set; }
-        public enum sign
-        {
-            min,plus
         }
     }
-
-    
 }

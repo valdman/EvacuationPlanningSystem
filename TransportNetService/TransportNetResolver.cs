@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TransportNetService.Application;
 using TransportNetService.Entities;
 
@@ -10,14 +7,19 @@ namespace TransportNetService
 {
     public class TransportNetResolver : ITransportNetResolver
     {
-       
+        private readonly IOptimizer optimizer;
+        private readonly IPlanBuilder planBuilder;
+
+
+        private readonly TransportTable resultTable;
+
 
         public TransportNetResolver(TransportTable table)
         {
             optimizer = new PotencialMethodOptimizer();
             planBuilder = new NorthWestPlanBuilder();
 
-            TransportTable rawTable = _isSolvable(table) ? table : _toClosed(table);
+            var rawTable = _isSolvable(table) ? table : _toClosed(table);
 
             resultTable = optimizer.optimize(planBuilder.Build(rawTable));
         }
@@ -38,45 +40,25 @@ namespace TransportNetService
 
         private TransportTable _toClosed(TransportTable table)
         {
+            var sources = table.Sources.ToList();
+            var sinks = table.Sinks.ToList();
+            int[,] costs;
 
-                List<Node> sources = table.Sources.ToList();
-                List<Node> sinks = table.Sinks.ToList();
-                int[,] costs;
 
-            
-                var difference = sources.Sum(node => node.Value) - sinks.Sum(node => node.Value);
-                Node fictionNode = new Node(-1, Math.Abs(difference));
-                if (difference < 0)
-                {
-                    sources.Add(fictionNode);
-                    
-                }
-                else
-                {
-                    sinks.Add(fictionNode);
-                    
-                }
-                
-                costs = new int[sources.Count, sinks.Count];
+            var difference = sources.Sum(node => node.Value) - sinks.Sum(node => node.Value);
+            var fictionNode = new Node(-1, Math.Abs(difference));
+            if (difference < 0)
+                sources.Add(fictionNode);
+            else
+                sinks.Add(fictionNode);
 
-                for (int i = 0; i < sources.Count; i++)
-                {
-                    for (int j = 0; j < sinks.Count; j++)
-                    {
-                        costs[i, j] = (i < table.Sources.Length && j < table.Sinks.Length) ? table.Plan[i, j].Cost : 0;
-                    }
-                }
+            costs = new int[sources.Count, sinks.Count];
 
-                return new TransportTable(sources, sinks, costs);
-                
+            for (var i = 0; i < sources.Count; i++)
+            for (var j = 0; j < sinks.Count; j++)
+                costs[i, j] = i < table.Sources.Length && j < table.Sinks.Length ? table.Plan[i, j].Cost : 0;
+
+            return new TransportTable(sources, sinks, costs);
         }
-
-
-
-        private TransportTable resultTable;
-        private IOptimizer optimizer;
-        private IPlanBuilder planBuilder;
-        
     }
-
 }
