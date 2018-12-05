@@ -8,9 +8,7 @@ namespace PlanService
     {
         public IEnumerable<Way> FindGateway(Plan plan, Point beginPoint)
         {
-            var planCopy = plan.DeepCopy();
-
-            foreach (var cell in planCopy)
+            foreach (var cell in plan)
                 cell.CellState &= ~CellState.Visited;
 
             var ways = new List<Way>();
@@ -22,29 +20,29 @@ namespace PlanService
             while (queue.Count != 0)
             {
                 var here = queue.Dequeue();
-                planCopy[here].CellState |= CellState.Visited;
+                plan[here].CellState |= CellState.Visited;
 
-                var gateCapasityHere = planCopy[here].GateCapasity;
-                var manHere = planCopy[beginPoint].NumberOfManHere;
+                var gateCapasityHere = plan[here].GateCapasity;
+                var manHere = plan[beginPoint].NumberOfManHere;
 
                 if (gateCapasityHere > 0)
                 {
                     if (manHere <= gateCapasityHere)
                     {
                         var endedWay = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
-                        endedWay.PeopleOnWay = planCopy[beginPoint].NumberOfManHere;
-                        planCopy[beginPoint].NumberOfManHere -= manHere;
-                        planCopy[here].GateCapasity -= manHere;
+                        endedWay.PeopleOnWay = plan[beginPoint].NumberOfManHere;
+                        plan[beginPoint].NumberOfManHere -= manHere;
+                        plan[here].GateCapasity -= manHere;
                         ways.Add(endedWay);
                         break;
                     }
                     var wayToAnotherGate = GetWayByBacktrack(backtrack, here, beginPoint, manHere);
                     wayToAnotherGate.PeopleOnWay = gateCapasityHere;
-                    planCopy[beginPoint].NumberOfManHere -= gateCapasityHere;
+                    plan[beginPoint].NumberOfManHere -= gateCapasityHere;
                     ways.Add(wayToAnotherGate);
                 }
 
-                var neighbours = GetNeighbours(planCopy, here);
+                var neighbours = GetNeighbours(plan, here);
                 foreach (var neighbour in neighbours)
                 {
                     backtrack.Add(neighbour, here);

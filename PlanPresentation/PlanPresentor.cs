@@ -32,14 +32,26 @@ namespace PlanPresentation
 
         public void RunRandomSimulation(IEnumerable<int> gatesCapasities, int peopleNumber)
         {
-            CurrentPlan = _planGenerator
-                .LocateGatesAndPeopleRandom(CurrentPlan, gatesCapasities, peopleNumber);
+            CurrentPlan = _planGenerator.LocateGatesAndPeopleRandom(CurrentPlan, gatesCapasities, peopleNumber);
+            ResolvePlan();
+        }
+
+        public void ReloadPeople(int peopleNumber)
+        {
+            CurrentPlan = _planGenerator.RelocatePeople(CurrentPlan, peopleNumber);
+            ResolvePlan();
+        }
+
+        public void ReloadGates(IEnumerable<int> gateCapasities)
+        {
+            CurrentPlan = _planGenerator.RelocateGates(CurrentPlan, gateCapasities);
             ResolvePlan();
         }
 
         private void ResolvePlan()
         {
             CurrentSolution = new List<Way>();
+            var currentPlanCopy = CurrentPlan.DeepCopy();
             for (var x = 0; x < CurrentPlan.Width; x++)
             for (var y = 0; y < CurrentPlan.Height; y++)
             {
@@ -47,7 +59,7 @@ namespace PlanPresentation
                 if (cell.NumberOfManHere <= 0) continue;
 
                 var beginPoint = new System.Drawing.Point(x, y);
-                foreach (var solution in _planResolver.FindGateway(CurrentPlan, beginPoint))
+                foreach (var solution in _planResolver.FindGateway(currentPlanCopy, beginPoint))
                     CurrentSolution.Add(solution);
             }
 

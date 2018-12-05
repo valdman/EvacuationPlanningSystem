@@ -14,15 +14,22 @@ namespace PlanService
         {
             var plan = new Plan(width, height);
 
-            VisitCell(plan, _randomGenerator.Next(width), _randomGenerator.Next(height));
+            VisitCell(plan, new Point(_randomGenerator.Next(width), _randomGenerator.Next(height)));
             return plan;
         }
 
         public Plan LocateGatesAndPeopleRandom(Plan plan, IEnumerable<int> gatesCapasities, int peopleNumber)
         {
+            RelocateGates(plan, gatesCapasities);
+            RelocatePeople(plan, peopleNumber);
+
+            return plan;
+        }
+
+        public Plan RelocatePeople(Plan plan, int peopleNumber)
+        {
             foreach (var cell in plan)
             {
-                cell.GateCapasity = 0;
                 cell.NumberOfManHere = 0;
             }
 
@@ -34,6 +41,18 @@ namespace PlanService
                 plan[x, y].NumberOfManHere++;
             }
 
+            return plan;
+        }
+
+        public Plan RelocateGates(Plan plan, IEnumerable<int> gatesCapasities)
+        {
+            foreach (var cell in plan)
+            {
+                cell.GateCapasity = 0;
+                cell.NumberOfManHere = 0;
+            }
+
+            var randomIndexGenerator = new Random();
             foreach (var gatesCapasity in gatesCapasities)
             {
                 var x = randomIndexGenerator.Next(plan.Width);
@@ -72,17 +91,17 @@ namespace PlanService
                 };
         }
 
-        private void VisitCell(Plan plan, int x, int y)
+        private void VisitCell(Plan plan, Point beginPoint)
         {
-            plan[x, y].CellState |= CellState.Visited;
-            foreach (var p in GetNeighboursOfCell(plan, new Point(x, y))
+            plan[beginPoint].CellState |= CellState.Visited;
+            foreach (var p in GetNeighboursOfCell(plan, beginPoint)
                 .Shuffle(_randomGenerator)
-                .Where(z => !plan[z.Neighbour.X, z.Neighbour.Y]
+                .Where(z => !plan[z.Neighbour]
                     .CellState.HasFlag(CellState.Visited)))
             {
-                plan[x, y].CellState -= p.Wall;
-                plan[p.Neighbour.X, p.Neighbour.Y].CellState -= p.Wall.OppositeWall();
-                VisitCell(plan, p.Neighbour.X, p.Neighbour.Y);
+                plan[beginPoint].CellState -= p.Wall;
+                plan[p.Neighbour].CellState -= p.Wall.OppositeWall();
+                VisitCell(plan, p.Neighbour);
             }
         }
 
