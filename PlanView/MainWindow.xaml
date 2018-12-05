@@ -7,8 +7,11 @@
         mc:Ignorable="d"
         Title="EvacuationPlanning" Height="600" Width="600" MinWidth="600">
     <Grid>
-        <Canvas Name="Canvas" Margin="0,0,0,80" />
+        <Canvas Name="Canvas" Margin="0,0,0,80" Background="White" />
         <Canvas />
+        <Button Name="ShowHintButton" 
+                Content="?" Width="10" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                Margin="10"/>
         <Grid VerticalAlignment="Bottom" Height="80">
 
             <Grid Name="PlanBlock" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="130" Height="74"
@@ -38,9 +41,16 @@
                 <TextBox Name="ManCount" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10, 5"
                          TextWrapping="Wrap" Width="30" Height="20" Text="6" />
             </Grid>
-
-            <Button Name="StartButton" Content="Start simulation" HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom" Margin="20" Height="20" Width="90" />
+            <Grid VerticalAlignment="Center" HorizontalAlignment="Right" Width="210" Height="70">
+                <Button Name="RelocatePeople" Content="Relocate people" HorizontalAlignment="Left"
+                        VerticalAlignment="Top" Margin="10" Height="20" Width="90" Click="RelocatePeople_Click" />
+                <Button Name="RelocateGats" Content="Relocate Gates" HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom" Margin="10" Height="20" Width="90" Click="RelocateGats_Click" />
+                <Button Name="ShowUnitsButton" Content="Show units" HorizontalAlignment="Right"
+                        VerticalAlignment="Top" Margin="10" Height="20" Width="90" Click="ShowUnitsButton_Click" />
+                <Button Name="StartButton" Content="Start simulation" HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" Margin="10" Height="20" Width="90" />
+            </Grid>
         </Grid>
     </Grid>
 </Window>

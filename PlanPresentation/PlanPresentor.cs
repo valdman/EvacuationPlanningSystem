@@ -32,8 +32,19 @@ namespace PlanPresentation
 
         public void RunRandomSimulation(IEnumerable<int> gatesCapasities, int peopleNumber)
         {
-            CurrentPlan = _planGenerator
-                .LocateGatesAndPeopleRandom(CurrentPlan, gatesCapasities, peopleNumber);
+            CurrentPlan = _planGenerator.LocateGatesAndPeopleRandom(CurrentPlan, gatesCapasities, peopleNumber);
+            ResolvePlan();
+        }
+
+        public void ReloadPeople(int peopleNumber)
+        {
+            CurrentPlan = _planGenerator.RelocatePeople(CurrentPlan, peopleNumber);
+            ResolvePlan();
+        }
+
+        public void ReloadGates(IEnumerable<int> gateCapasities)
+        {
+            CurrentPlan = _planGenerator.RelocateGates(CurrentPlan, gateCapasities);
             ResolvePlan();
         }
 

@@ -69,7 +69,14 @@ namespace PlanPresentation
             foreach (var way in _planPresentor?.CurrentSolution ?? Enumerable.Empty<Way>())
             {
                 int i;
-                var points = way.WayOut.Select(point => CenterOfCell(point.X, point.Y)).ToList();
+                var points = way.WayOut.Select(delegate(System.Drawing.Point point)
+                {
+                    var index = way.WayOut.ToList().IndexOf(point);
+                    double shiftX = index / 5.0,
+                        shiftY = index / 5.0;
+                    var centerOfNextCell = CenterOfCell(point.X, point.Y);
+                    return  new Point(centerOfNextCell.X + shiftX, centerOfNextCell.Y + shiftY);
+                }).ToList();
                 var count = points.Count;
                 var wayColor = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255),
                     (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
@@ -79,13 +86,12 @@ namespace PlanPresentation
                     var wayLine = new ArrowLine
                     {
                         Stroke = wayColor,
-                        StrokeThickness = 2,
+                        StrokeThickness = 1,
                         X1 = points[i].X,
                         Y1 = points[i].Y,
                         X2 = points[i + 1].X,
                         Y2 = points[i + 1].Y,
-                        ArrowLength = 1,
-                        Opacity = 0.5
+                        ArrowLength = 3,
                     };
                     _planPresentor.ViewWindow.Children.Add(wayLine);
                 }

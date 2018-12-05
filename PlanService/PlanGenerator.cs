@@ -20,9 +20,16 @@ namespace PlanService
 
         public Plan LocateGatesAndPeopleRandom(Plan plan, IEnumerable<int> gatesCapasities, int peopleNumber)
         {
+            RelocateGates(plan, gatesCapasities);
+            RelocatePeople(plan, peopleNumber);
+
+            return plan;
+        }
+
+        public Plan RelocatePeople(Plan plan, int peopleNumber)
+        {
             foreach (var cell in plan)
             {
-                cell.GateCapasity = 0;
                 cell.NumberOfManHere = 0;
             }
 
@@ -34,6 +41,18 @@ namespace PlanService
                 plan[x, y].NumberOfManHere++;
             }
 
+            return plan;
+        }
+
+        public Plan RelocateGates(Plan plan, IEnumerable<int> gatesCapasities)
+        {
+            foreach (var cell in plan)
+            {
+                cell.GateCapasity = 0;
+                cell.NumberOfManHere = 0;
+            }
+
+            var randomIndexGenerator = new Random();
             foreach (var gatesCapasity in gatesCapasities)
             {
                 var x = randomIndexGenerator.Next(plan.Width);
